@@ -1,13 +1,14 @@
-package life.majiang.community.modle;
+package life.majiang.community.dto;
 
+import life.majiang.community.modle.User;
 import lombok.Data;
 
 /**
  * @author Xue
- * @date 2020/3/16 - 11:43 上午
+ * @date 2020/3/16 - 6:51 下午
  */
 @Data
-public class Question {
+public class QuestionDTO {
     private Integer id;
     private String title;
     private String desc;
@@ -18,5 +19,6 @@ public class Question {
     private Integer viewCount;
     private Integer commentCount;
     private Integer likeCount;
-
+    //关联user可以获取头像
+    private User user;
 }

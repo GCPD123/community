@@ -59,6 +59,7 @@ public class AuthorizeController {
             user.setAccountId(String.valueOf(githubUser.getId()));
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
+            user.setAvatarUrl(githubUser.getAvatar_url());
             userMapper.insert(user);
             //登陆成功写入数据库 用数据库存储信息 然后给浏览器一个token 是我们定义的 只有我们知道 然后凭这个token就可以去数据库查找用户是否在
             response.addCookie(new Cookie("token",token));

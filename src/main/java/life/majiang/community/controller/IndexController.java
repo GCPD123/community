@@ -28,7 +28,8 @@ public class IndexController {
                     String token = cookie.getValue();
                     User user =  userMapper.findToken(token);
                     if(user !=null){
-                        //找到了用户 还是放到session中 方便从前端取出来
+                        //找到了用户 还是放到session中 方便从前端取出来 是为了让页面取出信息 ${session}
+                        //cookie是为了让浏览器记住登陆状态
                         request.getSession().setAttribute("user",user);
                     }
                     break;

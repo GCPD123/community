@@ -7,6 +7,8 @@
 <!--    引入css-->
     <link rel="stylesheet" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+<!--    自己定义的css-->
+    <link rel="stylesheet" href="css/community.css">
 <!--    引入bootstrap的js之前 一定要引入jq js依赖jq 并且需要爱maven处重新导入下资源 否则重新编译也不生效的-->
     <script src="js/jquery.min.js"></script>
     <!--    引入js-->
@@ -53,6 +55,49 @@
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
 </nav>
+<div class="container-fluid main">
+    <div class="row">
+        <div class="col-lg-9 col-md-12 col-xs-12" >
+
+            <h2><span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"></span>发起</h2>
+            <hr>
+
+            <form action="/publish" method="post">
+                <div class="form-group">
+                    <label for="title">问题标题（简单摘要）</label>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="问题标题..." th:value="${title}">
+                </div>
+                <div class="form-group">
+                    <label for="desc">问题补充（必填,详细描述）</label>
+                    <textarea name="desc" id="desc" cols="30" rows="10" class="form-control" th:text="${desc}" ></textarea>
+
+                </div>
+
+                <div class="form-group">
+                    <label for="tag">添加标签</label>
+                    <input type="text" class="form-control" id="tag" name="tag" placeholder="输入标签以逗号分割" th:value="${tag}">
+                </div>
+<!--                使用流式布局将这两个元素包裹 充满屏幕-->
+                <div class="container-fluid main">
+                    <div class="row">
+                        <div  class="alert alert-danger col-lg-9 col-md-12 col-xs-12" th:text="${error}" th:if="${error != null}"></div>
+                        <div class="col-lg-3 col-md-12 col-xs-12">
+                            <button type="submit" class="btn btn-success btn-publish ">发布</button>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+            </form>
+        </div>
+        <div class="col-lg-3 col-md-12 col-xs-12" >
+            <h3>问题发起指南</h3>
+            ....
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

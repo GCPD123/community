@@ -10,6 +10,8 @@
 [Github](https://github.com/)  
 [使用github授权登陆开发流程](https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/)
 
+使用mvn flyway:migrate可直接执行sql脚本，并控制版本
+
 ## 开发遇到的问题
 在页面引入bootstrap的js之前一定要引入jq否则有些功能不会生效，引入之后一定要在maven中重新导入 否则引入也不会生效  
 

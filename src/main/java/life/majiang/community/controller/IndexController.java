@@ -1,5 +1,6 @@
 package life.majiang.community.controller;
 
+import life.majiang.community.dto.PaginationDTO;
 import life.majiang.community.dto.QuestionDTO;
 import life.majiang.community.mapper.QuestionMapper;
 import life.majiang.community.mapper.UserMapper;
@@ -26,28 +27,31 @@ public class IndexController {
     QuestionService questionService;
     @Autowired
     UserMapper userMapper;
+
     @GetMapping("/")
-    public String index(HttpServletRequest request,Model model){
+    public String index(HttpServletRequest request, Model model,
+                        @RequestParam(value = "page", defaultValue = "1") Integer page,
+                        @RequestParam(value = "size", defaultValue = "5") Integer size) {
         Cookie[] cookies = request.getCookies();
-        if(cookies != null){
+        if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if(cookie.getName().equals("token")){
+                if (cookie.getName().equals("token")) {
                     String token = cookie.getValue();
-                    User user =  userMapper.findToken(token);
-                    if(user !=null){
+                    User user = userMapper.findToken(token);
+                    if (user != null) {
                         //找到了用户 还是放到session中 方便从前端取出来 是为了让页面取出信息 ${session}
                         //cookie是为了让浏览器记住登陆状态
-                        request.getSession().setAttribute("user",user);
+                        request.getSession().setAttribute("user", user);
                     }
                     break;
                 }
             }
         }
-        //service层的来源 当一个类需要组装两个部分时 question+user 就需要用到中间层来组装
+        //service层的来源 当一个类需要组装两个部分时 question+user 就需要用到中间层来组装 现在还加上分页
 
-        List<QuestionDTO> questionList = questionService.list();
+        PaginationDTO pagination = questionService.list(page,size);
         //不仅带有每个问题的信息 还有用户的所有信息
-        model.addAttribute("questionList",questionList);
+        model.addAttribute("pagination", pagination);
 
         return "index";
     }

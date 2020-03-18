@@ -5,6 +5,7 @@ import life.majiang.community.dto.GIthubUser;
 import life.majiang.community.mapper.UserMapper;
 import life.majiang.community.modle.User;
 import life.majiang.community.provider.GithubProvider;
+import life.majiang.community.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
@@ -33,13 +35,14 @@ public class AuthorizeController {
     @Value("${github.redirect.uri}")
     private String redirectUri;
 
+
     @Autowired
-    private UserMapper userMapper;
+    UserService userService;
 
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code") String code,
                            @RequestParam(name = "state") String state,
-                           HttpServletResponse response){
+                           HttpServletResponse response) {
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         accessTokenDTO.setRedirect_uri(redirectUri);
         accessTokenDTO.setClient_id(clientId);
@@ -49,29 +52,43 @@ public class AuthorizeController {
         String accessToken = githubProvider.getAccessToken(accessTokenDTO);
         //这个是github到用户信息
         GIthubUser githubUser = githubProvider.getUser(accessToken);
-        if(githubUser != null){
-            //写入数据库h2
+        if (githubUser != null) {
+            //将github给的用户模型转换成我们数据库需要的
             User user = new User();
             String token = UUID.randomUUID().toString();
             user.setToken(token);
             user.setName(githubUser.getName());
             user.setAccountId(String.valueOf(githubUser.getId()));
-            user.setGmtCreate(System.currentTimeMillis());
-            user.setGmtModified(user.getGmtCreate());
+
             user.setAvatarUrl(githubUser.getAvatar_url());
-            userMapper.insert(user);
+//          唯一的是accountid是gitgub给的
+            userService.createOrUpdate(user);
+
+            //这里如果没有上面的判断则每次都会无脑插入一个新用户 即使是同一个用户
+//            userMapper.insert(user);
             //登陆成功写入数据库 用数据库存储信息 然后给浏览器一个token 是我们定义的 只有我们知道 然后凭这个token就可以去数据库查找用户是否在
-            response.addCookie(new Cookie("token",token));
+            response.addCookie(new Cookie("token", token));
 //            //这时手动写一个固定的cokkie 为了测试
 //            request.getSession().setAttribute("githubUser",githubUser);
             //重定向到当前站点 默认是首页
             System.out.println(githubUser.getName());
             return "redirect:/";
-        }else {
+        } else {
             //登陆失败
             return "redirect:/";
         }
 
 
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        //首先移除session
+        request.getSession().removeAttribute("user");
+        //再移除cookie
+        Cookie cookie = new Cookie("token", null);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+        return "redirect:/";
     }
 }

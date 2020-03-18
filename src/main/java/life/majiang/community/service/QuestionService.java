@@ -119,4 +119,18 @@ public class QuestionService {
 
         return paginationDTO;
     }
+
+    //获取相关问题和用户信息
+    public QuestionDTO getById(Integer id) {
+        //获得question相关的东西 然后还要有其他信息
+        Question question =  questionMapper.getById(id);
+        QuestionDTO questionDTO = new QuestionDTO();
+        //依然封装
+        BeanUtils.copyProperties(question, questionDTO);
+        //还要获取user对象 然后封装进去
+        User user = userMapper.findById(question.getCreator());
+        questionDTO.setUser(user);
+
+        return questionDTO;
+    }
 }

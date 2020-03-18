@@ -1,10 +1,8 @@
 package life.majiang.community.controller;
 
 import life.majiang.community.dto.PaginationDTO;
-import life.majiang.community.mapper.UserMapper;
 import life.majiang.community.modle.User;
 import life.majiang.community.service.QuestionService;
-import org.h2.store.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -21,8 +18,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Controller
 public class ProfileController {
-    @Autowired
-    UserMapper userMapper;
+
     @Autowired
     QuestionService questionService;
 
@@ -31,24 +27,10 @@ public class ProfileController {
                           HttpServletRequest request,
                           @RequestParam(value = "page", defaultValue = "1") Integer page,
                           @RequestParam(value = "size", defaultValue = "5") Integer size){
-//还是验证是否登陆
-        //提升作用域
-        User user = null ;
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("token")) {
-                    String token = cookie.getValue();
-                     user = userMapper.findToken(token);
-                    if (user != null) {
-                        //找到了用户 还是放到session中 方便从前端取出来 是为了让页面取出信息 ${session}
-                        //cookie是为了让浏览器记住登陆状态
-                        request.getSession().setAttribute("user", user);
-                    }
-                    break;
-                }
-            }
-        }
+//还是验证是否登陆 拦截器已经将用户存入seesion了 现在要验证直接取出来即可
+
+
+        User user = (User) request.getSession().getAttribute("user");
         //未登陆 直接到首页
         if(user == null){
             return "redirect:/";

@@ -2,8 +2,6 @@ package life.majiang.community.controller;
 
 
 import life.majiang.community.mapper.QuestionMapper;
-import life.majiang.community.mapper.UserMapper;
-
 import life.majiang.community.modle.Question;
 import life.majiang.community.modle.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -26,8 +23,7 @@ public class PublishController {
     @Autowired
     QuestionMapper questionMapper;
 
-    @Autowired
-    UserMapper userMapper;
+
 
     @GetMapping("/publish")
     public String publish(){
@@ -57,22 +53,9 @@ public class PublishController {
             return "publish";
         }
 
-        //调用查找用户是否登陆的方法 从数据库中总查找
-        User user = null;
-        Cookie[] cookies = request.getCookies();
-        if(cookies != null){
-            for (Cookie cookie : cookies) {
-                if(cookie.getName().equals("token")){
-                    String token = cookie.getValue();
-                     user =  userMapper.findToken(token);
-                    if(user !=null){
-                        //找到了用户 还是放到session中 方便从前端取出来 这个是publish页面 和别的页面无关
-                        request.getSession().setAttribute("user",user);
-                    }
-                    break;
-                }
-            }
-        }
+
+//从seesion中找用户
+        User user = (User) request.getSession().getAttribute("user");
         //未登陆不能提交
         if(user == null){
             model.addAttribute("error","用户未登陆");

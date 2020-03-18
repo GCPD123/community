@@ -27,6 +27,9 @@ flyway使用注意 1。所有的操作都记录在history表中，该表用于�
 
 thymeleaf中动态拼接href:@{}代表内容为一个连接所有@{'/profile/'+${section}(page=${page})}就代表/profile/question?page=3这样（）里面是参数
 
+拦截器必须要实现hHandlerInterceptor接口 然后注入到springboot的自动配置类中 也就是自定义的配置类实现WebMvcConfigurer这个接口
+[spring文档](https://docs.spring.io/spring/docs/5.0.3.RELEASE/spring-framework-reference/web.html#mvc-config-interceptors)
+
 ## 快捷键
 alt + 拖移 = 选中一列快速编辑  
 fn + command + f9 = 编译当前文件（配合热部署）  
@@ -37,5 +40,9 @@ shift + fn + f6 = 修改所有相同的变量名
 遍历数组可以用数组名.for 自动生成循环体  
 alt + command + l = 自动格式化代码  
 command + shift + 方向 = 上下移动  
-alt + fn + f7 = 找到当前方法被哪些方法引用的地方
+alt + fn + f7 = 找到当前方法被哪些方法引用的地方  
+control + alt + o =删除无用的导入的包  
+command +fn + 12 = 看源码的时候可以快速查看所有方法  
+command + alt + 左右 = 查看源码时候可以快速回到之前或者之后看的地方  
+command + alt + b = 可以看到选中类到所有子类
 

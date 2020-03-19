@@ -5,14 +5,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <!--    引入css-->
-    <link rel="stylesheet" href="css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
 <!--    自己定义的css-->
-    <link rel="stylesheet" href="css/community.css">
+    <link rel="stylesheet" href="/css/community.css">
 <!--    引入bootstrap的js之前 一定要引入jq js依赖jq 并且需要爱maven处重新导入下资源 否则重新编译也不生效的-->
-    <script src="js/jquery.min.js"></script>
+    <script src="/js/jquery.min.js"></script>
     <!--    引入js-->
-    <script src="js/bootstrap.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
 
 
 </head>
@@ -26,6 +26,8 @@
             <hr>
 
             <form action="/publish" method="post">
+<!--                隐藏id方便传回后台判断唯一性-->
+                <input type="hidden" name="id" th:value="${id}">
                 <div class="form-group">
                     <label for="title">问题标题（简单摘要）</label>
                     <input type="text" class="form-control" id="title" name="title" placeholder="问题标题..." th:value="${title}">

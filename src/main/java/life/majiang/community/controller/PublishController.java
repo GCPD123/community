@@ -1,13 +1,16 @@
 package life.majiang.community.controller;
 
 
+import life.majiang.community.dto.QuestionDTO;
 import life.majiang.community.mapper.QuestionMapper;
 import life.majiang.community.modle.Question;
 import life.majiang.community.modle.User;
+import life.majiang.community.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -20,11 +23,30 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class PublishController {
 
+//    @Autowired
+//    QuestionMapper questionMapper;
     @Autowired
-    QuestionMapper questionMapper;
+    QuestionService questionService;
 
 
 
+    @GetMapping("/publish/{id}")
+    public String edit(@PathVariable("id") Integer id,Model model){
+        //只是多一个封装 原数据不变
+        QuestionDTO question = questionService.getById(id);
+        //因为是页面要求的这样一个一个传
+        model.addAttribute("title",question.getTitle());
+        model.addAttribute("desc",question.getDesc());
+        model.addAttribute("tag",question.getTag());
+        //给页面一个id 后面页面又将id传回后台 好判断
+        model.addAttribute("id",question.getId());
+
+        //修改和发布页面是同一个 但是后面根据是否有问题id可以进行修改和新增
+        return "publish";
+
+    }
+
+    //该方法是复用 修改和新增一起 所以要判断 根据id判断
     @GetMapping("/publish")
     public String publish(){
         return "publish";
@@ -33,6 +55,7 @@ public class PublishController {
     public String doPublish(@RequestParam("title") String title,
                             @RequestParam("desc")String desc,
                             @RequestParam("tag") String tag,
+                            @RequestParam(value = "id",required = false) Integer id,
                             HttpServletRequest request,
                             Model model){
 
@@ -61,15 +84,20 @@ public class PublishController {
             model.addAttribute("error","用户未登陆");
             return "publish";
         }
-        Question quesion = new Question();
-        quesion.setTitle(title);
-        quesion.setDesc(desc);
-        quesion.setTag(tag);
-        quesion.setCreator(user.getId());
-        quesion.setGmtCreate(System.currentTimeMillis());
-        quesion.setGmtModified(quesion.getGmtCreate());
-        questionMapper.create(quesion);
+        Question question = new Question();
+        question.setTitle(title);
+        question.setDesc(desc);
+        question.setTag(tag);
+        question.setCreator(user.getId());
+
+        question.setId(id);
+        //新增或更新 由id判断
+        questionService.createOrUpdate(question);
+
+
+//        questionMapper.create(question);
 
         return "redirect:/";
     }
+
 }

@@ -9,6 +9,9 @@
 ## 工具
 [Github](https://github.com/)  
 [使用github授权登陆开发流程](https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/)
+[mybatis逆向工程](http://mybatis.org/generator/running/runningWithMaven.html)
+使用直接生成
+mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate
 
 使用mvn flyway:migrate可直接执行sql脚本，并控制版本
 
@@ -30,6 +33,10 @@ thymeleaf中动态拼接href:@{}代表内容为一个连接所有@{'/profile/'+$
 拦截器必须要实现hHandlerInterceptor接口 然后注入到springboot的自动配置类中 也就是自定义的配置类实现WebMvcConfigurer这个接口
 [spring文档](https://docs.spring.io/spring/docs/5.0.3.RELEASE/spring-framework-reference/web.html#mvc-config-interceptors)
 
+
+在做登出的时候需要删除cookie和session cookie中携带token，在登陆的时候会到数据库中查找 然后登陆，所以要删除，seesion中存有用户信息，所以也要删除
+删除cookie的方法是 重新创建一个同名的cookie 然后传入null，并设置最大存活时间为0
+
 ## 快捷键
 alt + 拖移 = 选中一列快速编辑  
 fn + command + f9 = 编译当前文件（配合热部署）  
@@ -46,3 +53,15 @@ command +fn + 12 = 看源码的时候可以快速查看所有方法
 command + alt + 左右 = 查看源码时候可以快速回到之前或者之后看的地方  
 command + alt + b = 可以看到选中类到所有子类
 
+## MBG使用  
+1. 引入依赖
+2. 配置generatorConfig.xml文件 
+3. 执行mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate 生成 模型（pojo）mapper(接口) sql map（真正执行sql的文件） example(拼装条件)
+4. 使用的时候要告诉springboot需要扫描的包和上哪找mapper和sql map文件所以主配置类上加上@MapperScan(basePackages = "life.majiang.community.mapper") 主配置文件中加入mybatis.type-aliases-package和mybatis.mapper-locations
+
+## 异常处理
+异常有两种：一种是业务逻辑中比如查询的id不存在，一种是浏览器请求服务器的资源不存在如localhost:8080/123  
+当产生了异常时，浏览器可以看到跳转到了一个/error页面，这个跳转是boot完成的，但是页面需要我们自己定义而且叫error，自定义异常处理器的作用就是将异常信息传到页面展示出来  
+异常处理器的作用就是处理指定异常，而异常是我们手动抛出来的，可以自己定义  
+而其他未处理的异常（请求资源没有或者服务器异常500等）都需要basicerrorcontroller处理，我们也可以自定义，也是将信息传到页面的思路  
+总结：产生任何异常后boot都会帮我们产生一个/error请求，默认情况下处理这个请求的是basicerrorocntroller,它处理的方式是调用视图解析器然后就可以跳转到指定页面了/error/404这种页面，而我们可以自定义一个controller替换调basicerrorcontroller

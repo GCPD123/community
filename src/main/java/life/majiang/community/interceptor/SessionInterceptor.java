@@ -2,6 +2,7 @@ package life.majiang.community.interceptor;
 
 import life.majiang.community.mapper.UserMapper;
 import life.majiang.community.modle.User;
+import life.majiang.community.modle.UserExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -10,6 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author Xue
@@ -28,11 +30,15 @@ public class SessionInterceptor implements HandlerInterceptor {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("token")) {
                     String token = cookie.getValue();
-                    User user = userMapper.findToken(token);
-                    if (user != null) {
+                    UserExample example = new UserExample();
+                    //拼接sql
+                    example.createCriteria().andTokenEqualTo(token);
+                    List<User> users = userMapper.selectByExample(example);
+//                    User user = userMapper.findToken(token);
+                    if (users.size() != 0) {
                         //找到了用户 还是放到session中 方便从前端取出来 是为了让页面取出信息 ${session}
                         //cookie是为了让浏览器记住登陆状态
-                        request.getSession().setAttribute("user", user);
+                        request.getSession().setAttribute("user", users.get(0));
                     }
                     break;
                 }

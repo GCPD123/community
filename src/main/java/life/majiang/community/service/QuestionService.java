@@ -1,15 +1,17 @@
 package life.majiang.community.service;
 
+import life.majiang.community.dto.CommentDTO;
 import life.majiang.community.dto.PaginationDTO;
 import life.majiang.community.dto.QuestionDTO;
 import life.majiang.community.exception.CustomizeErrorCode;
 import life.majiang.community.exception.CustomizeException;
+import life.majiang.community.mapper.CommentMapper;
+import life.majiang.community.mapper.QuestionExtMapper;
 import life.majiang.community.mapper.QuestionMapper;
 import life.majiang.community.mapper.UserMapper;
 import life.majiang.community.modle.Question;
 import life.majiang.community.modle.QuestionExample;
 import life.majiang.community.modle.User;
-import life.majiang.community.modle.UserExample;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +31,14 @@ public class QuestionService {
     private QuestionMapper questionMapper;
     @Autowired
     private UserMapper userMapper;
+    //自己定义的mapper 为了解决view
+    //j
+    @Autowired
+    private QuestionExtMapper questionExtMapper;
 
     public PaginationDTO list(Integer page, Integer size) {
         Integer totalPage;
-        //拿到偏移量 偏移量是直接输入到数据库到参数
+        //拿到偏移量 偏移量是直接输入到数据库的参数
         Integer offset = size * (page - 1);
         Integer totalCount = (int) questionMapper.countByExample(new QuestionExample());
         PaginationDTO paginationDTO = new PaginationDTO();
@@ -83,7 +89,7 @@ public class QuestionService {
     }
 
     //该方法和上面一模一样 因为都是要获得查询分页对象 这次就是加上一个id约束
-    public PaginationDTO list(Integer userId, Integer page, Integer size) {
+    public PaginationDTO list(Long userId, Integer page, Integer size) {
         Integer totalPage;
 
         PaginationDTO paginationDTO = new PaginationDTO();
@@ -141,7 +147,7 @@ public class QuestionService {
     }
 
     //获取相关问题和用户信息
-    public QuestionDTO getById(Integer id) {
+    public QuestionDTO getById(Long id) {
         //获得question相关的东西 然后还要有其他信息
         Question question = questionMapper.selectByPrimaryKey(id);
         //异常判断 自定义异常 将其中的异常信息传到页面
@@ -184,8 +190,22 @@ public class QuestionService {
             //表示新增
             question.setGmtCreate(System.currentTimeMillis());
             question.setGmtModified(question.getGmtCreate());
-            questionMapper.insert(question);
+            questionMapper.insertSelective(question);
         }
 
     }
+
+    public void incView(Long id) {
+
+        //我新创建了一个对象 该对象只有VIew有值，所以只更新这个值，其他的还是保留原来的值
+        Question question = new Question();
+        //该方法只要两个数据就可以执行 每次增加1
+        question.setId(id);
+        question.setViewCount(1);
+        questionExtMapper.incView(question);
+
+    }
+
+
+
 }

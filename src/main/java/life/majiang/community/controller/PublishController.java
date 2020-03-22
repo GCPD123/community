@@ -31,7 +31,7 @@ public class PublishController {
 
 
     @GetMapping("/publish/{id}")
-    public String edit(@PathVariable("id") Integer id,Model model){
+    public String edit(@PathVariable("id") Long id,Model model){
         //只是多一个封装 原数据不变
         QuestionDTO question = questionService.getById(id);
         //因为是页面要求的这样一个一个传
@@ -55,7 +55,7 @@ public class PublishController {
     public String doPublish(@RequestParam("title") String title,
                             @RequestParam("desc")String desc,
                             @RequestParam("tag") String tag,
-                            @RequestParam(value = "id",required = false) Integer id,
+                            @RequestParam(value = "id",required = false) Long id,
                             HttpServletRequest request,
                             Model model){
 

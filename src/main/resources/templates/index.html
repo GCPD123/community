@@ -15,6 +15,20 @@
 
 
 </head>
+<script type="application/javascript">
+    //窗口加载完毕 后做校验 同一个浏览器存储的都可以取出来
+    window.onload = function () {
+
+        let item = window.localStorage.getItem("closable");
+        //必须都是字符串 因为只能存储字符串
+        if (item == "true"){
+            window.close();
+            //别忘了删除
+            window.localStorage.removeItem("closable");
+        }
+    }
+
+</script>
 <body>
 <div th:replace="~{navigation :: nav}"></div>
 <div class="container-fluid main">

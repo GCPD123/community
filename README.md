@@ -37,6 +37,16 @@ thymeleaf中动态拼接href:@{}代表内容为一个连接所有@{'/profile/'+$
 在做登出的时候需要删除cookie和session cookie中携带token，在登陆的时候会到数据库中查找 然后登陆，所以要删除，seesion中存有用户信息，所以也要删除
 删除cookie的方法是 重新创建一个同名的cookie 然后传入null，并设置最大存活时间为0
 
+sfari请求头中好像没有content type，所以我根据accept做的异常返回判断，想要接受json就返回给json,想要收到页面就返回给页面  
+
+使用mac的浏览器调试的时候需要刷新浏览器缓存，不然样式js更新后不能及时生效，option+command+r刷新浏览器缓存！
+
+window.localstory里面存的只能是字符串，同一个浏览器中的东西都可以再不同页面取出来，可以用来判断关闭窗口，是在页面加载完毕后判断
+
+insert和insertselective区别在于前者对null也操作，后者判断如果有null就不更新这一项，保持原来的值，比如默认值
+
+flyway:migrate如果要删除一个文件记得要删除version中的版本信息，否则以后操作就不成功了，他会校验每一个操作
+
 ## 快捷键
 alt + 拖移 = 选中一列快速编辑  
 fn + command + f9 = 编译当前文件（配合热部署）  
@@ -51,7 +61,8 @@ alt + fn + f7 = 找到当前方法被哪些方法引用的地方
 control + alt + o =删除无用的导入的包  
 command +fn + 12 = 看源码的时候可以快速查看所有方法  
 command + alt + 左右 = 查看源码时候可以快速回到之前或者之后看的地方  
-command + alt + b = 可以看到选中类到所有子类
+command + alt + b = 可以看到选中类到所有子类  
+command + fn + f6 = 使用在方法上可以快速调换参数位置  
 
 ## MBG使用  
 1. 引入依赖

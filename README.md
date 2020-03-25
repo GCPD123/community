@@ -53,16 +53,17 @@ fn + command + f9 = 编译当前文件（配合热部署）
 fn + command + shift + f12 = 全屏当前画面  
 command + alt + v = 在方法参数外面快速new对象
 command + e = 调出最近编辑的文档 回车快速切换
-shift + fn + f6 = 修改所有相同的变量名
+**shift + fn + f6 = 修改所有相同的变量名**
 遍历数组可以用数组名.for 自动生成循环体  
 alt + command + l = 自动格式化代码  
 command + shift + 方向 = 上下移动  
-alt + fn + f7 = 找到当前方法被哪些方法引用的地方  
+**alt + fn + f7 = 找到当前方法被哪些方法引用的地方**  
 control + alt + o =删除无用的导入的包  
 command +fn + 12 = 看源码的时候可以快速查看所有方法  
 command + alt + 左右 = 查看源码时候可以快速回到之前或者之后看的地方  
 command + alt + b = 可以看到选中类到所有子类  
-command + fn + f6 = 使用在方法上可以快速调换参数位置  
+**command + fn + f6 = 使用在方法上可以快速调换参数位置 修改参数签名 所有引用重构**  
+**command + alt + v/m/p = 抽取变量/方法/参数**
 
 ## MBG使用  
 1. 引入依赖

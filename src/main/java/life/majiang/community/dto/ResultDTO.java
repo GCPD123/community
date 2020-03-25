@@ -11,10 +11,12 @@ import lombok.Data;
  * @date 2020/3/20 - 8:25 下午
  */
 @Data
-public class ResultDTO {
+//T代表一切
+public class ResultDTO<T> {
     //返回的状态码 前端可根据这个判断 是都显示
     private Integer code;
     private String message;
+    private T data;
 
     //其他地方直接可以用 传入两个参数直接创建出响应属性的对象
     public static ResultDTO errorOf(Integer code, String message) {
@@ -43,6 +45,13 @@ public class ResultDTO {
         return resultDTO;
     }
 
+    public static <T> ResultDTO okOf(T t) {
+        ResultDTO resultDTO = new ResultDTO();
+        resultDTO.setCode(200);
+        resultDTO.setMessage("请求成功");
+        resultDTO.setData(t);
+        return resultDTO;
+    }
 
 }
 

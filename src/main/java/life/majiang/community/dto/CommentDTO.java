@@ -17,6 +17,7 @@ public class CommentDTO {
     private Long gmtModified;
     private Long likeCount;
     private String content;
+    private Integer commentCount;
     //需要评论的用户信息
     private User user;
 }

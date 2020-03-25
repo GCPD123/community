@@ -4,10 +4,7 @@ import life.majiang.community.dto.CommentDTO;
 import life.majiang.community.enums.CommentTypeEnum;
 import life.majiang.community.exception.CustomizeErrorCode;
 import life.majiang.community.exception.CustomizeException;
-import life.majiang.community.mapper.CommentMapper;
-import life.majiang.community.mapper.QuestionExtMapper;
-import life.majiang.community.mapper.QuestionMapper;
-import life.majiang.community.mapper.UserMapper;
+import life.majiang.community.mapper.*;
 import life.majiang.community.modle.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +31,8 @@ public class CommentService {
     QuestionExtMapper questionExtMapper;
     @Autowired
     UserMapper userMapper;
+    @Autowired
+    CommentExtMapper commentExtMapper;
 
     //加上事务管理
     @Transactional
@@ -55,6 +54,14 @@ public class CommentService {
             }
             //存入
             commentMapper.insertSelective(comment);
+
+            //这里要新创建一个对象 插入的时候只需要id和增长数
+            Comment parentComment = new Comment();
+            //增加的是从数据库中查出来的1级评论个数
+            parentComment.setId(dbComment.getId());
+            parentComment.setCommentCount(1);
+            //让评论数增加
+            commentExtMapper.incComment(parentComment);
         } else {
             //回复的是问题 先把问题找出来 后面要操作这个问题相关的属性
             Question question = questionMapper.selectByPrimaryKey(comment.getParentId());
@@ -70,11 +77,13 @@ public class CommentService {
         }
     }
 
-    public List<CommentDTO> listByQuestionId(Long id) {
+    public List<CommentDTO> listByTargetId(Long id, CommentTypeEnum type) {
         //这个id是问题的id 对应到评论表中就是parentID但是还需要type
         CommentExample example = new CommentExample();
-        //这里CommentTypeEnum.QUESTION只是创建了一个CommentTypeEnum的对象 要type还要取出来
-        example.createCriteria().andParentIdEqualTo(id).andTypeEqualTo(CommentTypeEnum.QUESTION.getType());
+        //这里CommentTypeEnum.QUESTION只是创建了一个CommentTypeEnum的对象 要type还要取出来 如果已经是commenttypeenum对象的话 那就直接get
+        example.createCriteria().andParentIdEqualTo(id).andTypeEqualTo(type.getType());
+        //想要取出来的东西倒叙排序 desc倒叙的意思 这里面是数据库语法
+        example.setOrderByClause("gmt_create desc");
         //在该问题下的所有回复
         List<Comment> comments = commentMapper.selectByExample(example);
         if(comments.size() == 0){

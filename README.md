@@ -9,7 +9,9 @@
 ## 工具
 [Github](https://github.com/)  
 [使用github授权登陆开发流程](https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/)
-[mybatis逆向工程](http://mybatis.org/generator/running/runningWithMaven.html)
+[mybatis逆向工程](http://mybatis.org/generator/running/runningWithMaven.html)  
+[md支持工具](http://editor.md.ipandao.com/)  
+[阿里云存储服务SDK参考文档](https://help.aliyun.com)
 使用直接生成
 mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate
 

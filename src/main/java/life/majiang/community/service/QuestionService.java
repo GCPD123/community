@@ -3,6 +3,7 @@ package life.majiang.community.service;
 import life.majiang.community.dto.CommentDTO;
 import life.majiang.community.dto.PaginationDTO;
 import life.majiang.community.dto.QuestionDTO;
+import life.majiang.community.dto.QuestionQueryDTO;
 import life.majiang.community.exception.CustomizeErrorCode;
 import life.majiang.community.exception.CustomizeException;
 import life.majiang.community.mapper.CommentMapper;
@@ -12,13 +13,16 @@ import life.majiang.community.mapper.UserMapper;
 import life.majiang.community.modle.Question;
 import life.majiang.community.modle.QuestionExample;
 import life.majiang.community.modle.User;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Xue
@@ -36,12 +40,24 @@ public class QuestionService {
     @Autowired
     private QuestionExtMapper questionExtMapper;
 
-    public PaginationDTO list(Integer page, Integer size) {
+    public PaginationDTO list(String search, Integer page, Integer size) {
+        if (StringUtils.isNotBlank(search)) {
+//            按照空格分开
+            String[] s = StringUtils.split(search, " ");
+//            每个元素之间用|分割
+             search = Arrays.stream(s).collect(Collectors.joining("|"));
+        }
+
         Integer totalPage;
         //拿到偏移量 偏移量是直接输入到数据库的参数
         Integer offset = size * (page - 1);
-        Integer totalCount = (int) questionMapper.countByExample(new QuestionExample());
-        PaginationDTO paginationDTO = new PaginationDTO();
+        QuestionQueryDTO questionQueryDTO = new QuestionQueryDTO();
+        questionQueryDTO.setSearch(search);
+        Integer totalCount = questionExtMapper.countBySearch(questionQueryDTO);
+//                对这个方法进行重构 考虑到下面也要用到类似的方法 所以抽取出来一个对象传入
+//        Integer totalCount = (int) questionMapper.countByExample(new QuestionExample());
+        //指定这个类中数据的类型 t指任何类型都可以但是要指定清楚
+        PaginationDTO<QuestionDTO> paginationDTO = new PaginationDTO();
         //分页也需要id约束 原来生成的不带rowbounds也就是分页查询功能 要加上插件
 
 
@@ -68,7 +84,14 @@ public class QuestionService {
 
 
         //使用mybatis手动添加的分页插件不然没有rowbounds 需要offset和limit
-        List<Question> questions = questionMapper.selectByExampleWithRowbounds(new QuestionExample(), new RowBounds(offset, size));
+        QuestionExample example = new QuestionExample();
+        //倒叙排列所有问题 和回复一样
+        example.setOrderByClause("gmt_create desc");
+//        这两个是分页需要的数据
+        questionQueryDTO.setSize(size);
+        questionQueryDTO.setPage(offset);
+//        重构成一个方法
+        List<Question> questions = questionExtMapper.selectBysearch(questionQueryDTO);
         List<QuestionDTO> questionDTOList = new ArrayList<QuestionDTO>();
 
         for (Question question : questions) {
@@ -82,7 +105,7 @@ public class QuestionService {
 
         }
         //将问题对象也组装里面同时有用户信息
-        paginationDTO.setQuestions(questionDTOList);
+        paginationDTO.setData(questionDTOList);
 
         return paginationDTO;
 
@@ -92,7 +115,7 @@ public class QuestionService {
     public PaginationDTO list(Long userId, Integer page, Integer size) {
         Integer totalPage;
 
-        PaginationDTO paginationDTO = new PaginationDTO();
+        PaginationDTO<QuestionDTO> paginationDTO = new PaginationDTO();
         //指定用户的问题条数查询
 
         QuestionExample example = new QuestionExample();
@@ -125,7 +148,7 @@ public class QuestionService {
         QuestionExample example1 = new QuestionExample();
         example1.createCriteria().andCreatorEqualTo(userId);
         //同样的分页查询出来的数据返回给页面上
-        List<Question> questions = questionMapper.selectByExampleWithBLOBsWithRowbounds(example1, new RowBounds(offset,size));
+        List<Question> questions = questionMapper.selectByExampleWithBLOBsWithRowbounds(example1, new RowBounds(offset, size));
         //这是之前自己定义的方法 后面使用逆向了
 //        List<Question> list = questionMapper.listByUserId(userId, offset, size);
         List<QuestionDTO> questionDTOList = new ArrayList<QuestionDTO>();
@@ -141,7 +164,7 @@ public class QuestionService {
 
         }
         //将问题对象也组装里面同时有用户信息
-        paginationDTO.setQuestions(questionDTOList);
+        paginationDTO.setData(questionDTOList);
 
         return paginationDTO;
     }
@@ -151,7 +174,7 @@ public class QuestionService {
         //获得question相关的东西 然后还要有其他信息
         Question question = questionMapper.selectByPrimaryKey(id);
         //异常判断 自定义异常 将其中的异常信息传到页面
-        if(question == null){
+        if (question == null) {
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
         }
 //        Question question = questionMapper.getById(id);
@@ -182,9 +205,9 @@ public class QuestionService {
             questionExample.createCriteria().andIdEqualTo(question.getId());
             int i = questionMapper.updateByExampleSelective(updateQuestion, questionExample);
             //i=1表示更新成功 否则不成功 为了防止在修改的同时该问题已经被删除 所以还要加入判断
-            if(i != 1){
+            if (i != 1) {
                 //枚举直接通过类名访问
-                throw  new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+                throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
             }
         } else {
             //表示新增
@@ -207,5 +230,24 @@ public class QuestionService {
     }
 
 
+    public List<QuestionDTO> selectRelated(QuestionDTO queryDTO) {
+        if (queryDTO == null) {
+            return new ArrayList<>();
+        }
+        //将标签通过,号隔开并替换成|，因为sql中需要 这个就是正则需要匹配的语句
+        String regex = StringUtils.replace(queryDTO.getTag(), ",", "|");
+        Question question = new Question();
+        question.setTag(regex);
+        question.setId(queryDTO.getId());
+        List<Question> questions = questionExtMapper.selectRelated(question);
+        //因为上面返回的是question，而该方法需要返回DTO,所以可以通过lamda转换
+        List<QuestionDTO> questionDTOS = questions.stream().map(question1 -> {
+            QuestionDTO questionDTO = new QuestionDTO();
+            //然后将对象封装进去
+            BeanUtils.copyProperties(question1, questionDTO);
+            return questionDTO;
+        }).collect(Collectors.toList());
 
+        return questionDTOS;
+    }
 }

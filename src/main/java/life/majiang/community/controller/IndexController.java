@@ -21,13 +21,16 @@ public class IndexController {
     @GetMapping("/")
     public String index(Model model,
                         @RequestParam(value = "page", defaultValue = "1") Integer page,
-                        @RequestParam(value = "size", defaultValue = "5") Integer size) {
+                        @RequestParam(value = "size", defaultValue = "5") Integer size,
+                        @RequestParam(value = "search",required = false) String search) {
 
         //service层的来源 当一个类需要组装两个部分时 question+user 就需要用到中间层来组装 现在还加上分页
 
-        PaginationDTO pagination = questionService.list(page,size);
+        PaginationDTO pagination = questionService.list(search,page,size);
         //不仅带有每个问题的信息 还有用户的所有信息
         model.addAttribute("pagination", pagination);
+//        把搜索条件带给页面 当上下翻页的时候可以锁主条件
+        model.addAttribute("search", search);
 
         return "index";
     }

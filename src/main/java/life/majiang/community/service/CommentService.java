@@ -2,6 +2,8 @@ package life.majiang.community.service;
 
 import life.majiang.community.dto.CommentDTO;
 import life.majiang.community.enums.CommentTypeEnum;
+import life.majiang.community.enums.NotificationStatusEnum;
+import life.majiang.community.enums.NotificationTypeEnum;
 import life.majiang.community.exception.CustomizeErrorCode;
 import life.majiang.community.exception.CustomizeException;
 import life.majiang.community.mapper.*;
@@ -33,10 +35,14 @@ public class CommentService {
     UserMapper userMapper;
     @Autowired
     CommentExtMapper commentExtMapper;
+//通知的操作
+    @Autowired
+    NotificationMapper notificationMapper;
+
 
     //加上事务管理
     @Transactional
-    public void insert(Comment comment) {
+    public void insert(Comment comment, User commentator) {
         //判断问题是否存在 但是现在啊已经在里面的层了 返回值只能给上层 不方便处理 所以可以用异常 直接到异常处理
         if (comment.getParentId() == null || comment.getParentId() == 0) {
             //实际上最核心的就是创建一个自定义的异常然后将其中的code和message赋值 然后该异常就会到达我们定义的异常处理类
@@ -52,16 +58,23 @@ public class CommentService {
             if (dbComment == null) {
                 throw new CustomizeException(CustomizeErrorCode.COMMENT_NOT_FOUND);
             }
+            //评论的评论的问题 后面要到页面上展示出来
+            Question question = questionMapper.selectByPrimaryKey(dbComment.getParentId());
+            if(question == null){
+                throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+            }
             //存入
             commentMapper.insertSelective(comment);
 
             //这里要新创建一个对象 插入的时候只需要id和增长数
             Comment parentComment = new Comment();
             //增加的是从数据库中查出来的1级评论个数
-            parentComment.setId(dbComment.getId());
+            parentComment.setId(comment.getParentId());
             parentComment.setCommentCount(1);
             //让评论数增加
             commentExtMapper.incComment(parentComment);
+            //创建通知
+            createNotify(comment, dbComment.getCommentator(), question.getTitle(),commentator.getName(),  NotificationTypeEnum.REPLY_COMMENT, question.getId());
         } else {
             //回复的是问题 先把问题找出来 后面要操作这个问题相关的属性
             Question question = questionMapper.selectByPrimaryKey(comment.getParentId());
@@ -69,12 +82,38 @@ public class CommentService {
                 throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
             }
             //存入
-            //这里存在事务 要一起完成或失败
+            //这里初始的是null 数据库中默认就是0  null是不更新的
             commentMapper.insertSelective(comment);
             //然后将该问题的评论数加1
             question.setCommentCount(1);
             questionExtMapper.incComment(question);
+            //直接传入评论和问题的作者 这是我们抽取的方法
+            createNotify(comment,question.getCreator(), question.getTitle(),commentator.getName(),NotificationTypeEnum.REPLY_QUESTION, question.getId());
         }
+    }
+
+    //创建通知
+    private void createNotify(Comment comment, Long receiver, String outerTitle, String notifierName, NotificationTypeEnum notificationType, Long outerId) {
+//        如果接受者评论者是一个人则不通知
+        if(receiver == comment.getCommentator()){
+            return;
+        }
+        //评论过后通知给别人
+        Notification notification = new Notification();
+        notification.setGmtCreate(System.currentTimeMillis());
+        notification.setType(notificationType.getType());
+        //这个Id是 一级评论的id 回复的是谁
+        notification.setOuterid(outerId);
+        //通知人就是评论的创建者
+        notification.setNotifier(comment.getCommentator());
+        //设置状态为未读
+        notification.setStatus(NotificationStatusEnum.UNREAD.getStatus());
+        notification.setNotifierName(notifierName);
+        //外部标题 也就是问题的标题
+        notification.setOuterTitle(outerTitle);
+        //接受人是提问者
+        notification.setReceiver(receiver);
+        notificationMapper.insert(notification);
     }
 
     public List<CommentDTO> listByTargetId(Long id, CommentTypeEnum type) {

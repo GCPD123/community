@@ -1,11 +1,14 @@
 package life.majiang.community.controller;
 
 
+import life.majiang.community.cache.TagCache;
 import life.majiang.community.dto.QuestionDTO;
+import life.majiang.community.dto.TagDTO;
 import life.majiang.community.mapper.QuestionMapper;
 import life.majiang.community.modle.Question;
 import life.majiang.community.modle.User;
 import life.majiang.community.service.QuestionService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,6 +43,8 @@ public class PublishController {
         model.addAttribute("tag",question.getTag());
         //给页面一个id 后面页面又将id传回后台 好判断
         model.addAttribute("id",question.getId());
+        //将准备好的可选标签给页面 展示出来
+        model.addAttribute("tags", TagCache.get());
 
         //修改和发布页面是同一个 但是后面根据是否有问题id可以进行修改和新增
         return "publish";
@@ -48,8 +53,11 @@ public class PublishController {
 
     //该方法是复用 修改和新增一起 所以要判断 根据id判断
     @GetMapping("/publish")
-    public String publish(){
+    public String publish(Model model){
+        //将准备好的可选标签给页面 展示出来
+        model.addAttribute("tags", TagCache.get());
         return "publish";
+
     }
     @PostMapping("/publish")
     public String doPublish(@RequestParam("title") String title,
@@ -63,6 +71,8 @@ public class PublishController {
         model.addAttribute("title",title);
         model.addAttribute("desc",desc);
         model.addAttribute("tag",tag);
+        //将准备好的可选标签给页面 展示出来
+        model.addAttribute("tags", TagCache.get());
 
         //数据校验
         if(title == null || title ==""){
@@ -73,6 +83,12 @@ public class PublishController {
             return "publish";
         }if(tag == null || tag ==""){
             model.addAttribute("error","标签不能为空");
+            return "publish";
+        }
+
+        String invalid = TagCache.filterInvalid(tag);
+        if(StringUtils.isNotBlank(invalid)){
+            model.addAttribute("error","输入非法标签"+invalid);
             return "publish";
         }
 

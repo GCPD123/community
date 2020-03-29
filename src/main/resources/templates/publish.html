@@ -2,17 +2,20 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>码匠社区</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-<!--    引入css-->
+    <!--    引入css-->
     <link rel="stylesheet" href="/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
-<!--    自己定义的css-->
+    <link rel="stylesheet" href="/css/editormd.min.css">
+    <!--    自己定义的css-->
     <link rel="stylesheet" href="/css/community.css">
-<!--    引入bootstrap的js之前 一定要引入jq js依赖jq 并且需要爱maven处重新导入下资源 否则重新编译也不生效的-->
+    <!--    引入bootstrap的js之前 一定要引入jq js依赖jq 并且需要爱maven处重新导入下资源 否则重新编译也不生效的-->
     <script src="/js/jquery.min.js"></script>
     <!--    引入js-->
     <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/community.js"></script>
+    <script src="/js/editormd.min.js"></script>
 
 
 </head>
@@ -20,32 +23,83 @@
 <div th:replace="~{navigation :: nav}"></div>
 <div class="container-fluid main">
     <div class="row">
-        <div class="col-lg-9 col-md-12 col-xs-12" >
+        <div class="col-lg-9 col-md-12 col-xs-12">
 
             <h2><span class="glyphicon glyphicon glyphicon-plus" aria-hidden="true"></span>发起</h2>
             <hr>
 
             <form action="/publish" method="post">
-<!--                隐藏id方便传回后台判断唯一性-->
+                <!--                隐藏id方便传回后台判断唯一性-->
                 <input type="hidden" name="id" th:value="${id}">
                 <div class="form-group">
                     <label for="title">问题标题（简单摘要）</label>
-                    <input type="text" class="form-control" id="title" name="title" placeholder="问题标题..." th:value="${title}">
+                    <input type="text" class="form-control" id="title" name="title" placeholder="问题标题..."
+                           th:value="${title}" autocomplete="off">
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="question-editor">
                     <label for="desc">问题补充（必填,详细描述）</label>
-                    <textarea name="desc" id="desc" cols="30" rows="10" class="form-control" th:text="${desc}" ></textarea>
+                    <textarea name="desc" id="desc" cols="30" rows="10" class="form-control"
+                              th:text="${desc}" style="display: none">
+
+
+                    </textarea>
 
                 </div>
+                <!--                markdown支持-->
+                <script type="text/javascript">
+                    $(function () {
+                        var editor = editormd("question-editor", {
+                            width: "100%",
+                            height: "350px",
+                            path: "/js/lib/",
+                            delay: 0,
+                            watch : false,
+                            placeholder : "请输入问题描述",
+                            emoji : true,
+                            //上传图片打开
+                            imageUpload : true,
+                            imageFormats   : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                            //上传的地址 可以是controller 只要是地址就行 它要求有返回值
+                            imageUploadURL : "/file/upload"
+                        });
+                    });
+                </script>
 
                 <div class="form-group">
                     <label for="tag">添加标签</label>
-                    <input type="text" class="form-control" id="tag" name="tag" placeholder="输入标签以逗号分割" th:value="${tag}">
+                    <input type="text" class="form-control" id="tag" name="tag" placeholder="输入标签以逗号分割"
+                           th:value="${tag}" autocomplete="off" onclick="showSelectTag()">
+                    <!--                    添加标签的部分-->
+                    <div id="select-tag" class="publish-tag-tab">
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <!--                            页面传来的标签备选项-->
+                            <li role="presentation" th:each="tagCategory,tagCategoryStat : ${tags}"
+                                th:class="${tagCategoryStat.first}?'active':''">
+                                <a th:href="${'#'+tagCategory.categoryName}" aria-controls="home" role="tab"
+                                   data-toggle="tab" th:text="${tagCategory.categoryName}">开发语言
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane" th:id="${tagCategory.categoryName}"
+                                 th:each="tagCategory : ${tags}"
+                                 th:class="${tagCategoryStat.first}?'active tab-pane':'tab-pane'">
+                                <span class="label label-info" th:each="tagTag : ${tagCategory.tags}">
+                                    <span class="glyphicon glyphicon-tags"
+                                          onclick="selectTag(this)" th:data-tag="${tagTag}" th:text="${' '+tagTag}">JAVA
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-<!--                使用流式布局将这两个元素包裹 充满屏幕-->
+                <!--                使用流式布局将这两个元素包裹 充满屏幕-->
                 <div class="container-fluid main">
                     <div class="row">
-                        <div  class="alert alert-danger col-lg-9 col-md-12 col-xs-12" th:text="${error}" th:if="${error != null}"></div>
+                        <div class="alert alert-danger col-lg-9 col-md-12 col-xs-12" th:text="${error}"
+                             th:if="${error != null}"></div>
                         <div class="col-lg-3 col-md-12 col-xs-12">
                             <button type="submit" class="btn btn-success btn-publish ">发布</button>
                         </div>
@@ -54,15 +108,14 @@
                 </div>
 
 
-
             </form>
         </div>
-        <div class="col-lg-3 col-md-12 col-xs-12" >
+        <div class="col-lg-3 col-md-12 col-xs-12">
             <h3>问题发起指南</h3>
             ....
         </div>
     </div>
 </div>
-
+<div th:replace="~{footer :: foot}"></div>
 </body>
 </html>

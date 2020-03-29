@@ -76,6 +76,12 @@
             <artifactId>h2</artifactId>
             <version>1.4.199</version>
         </dependency>
+<!--        阿里云存储-->
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>3.8.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -100,6 +106,8 @@
                         <artifactId>h2</artifactId>
                         <version>1.4.199</version>
                     </dependency>
+
+
                 </dependencies>
             </plugin>
 <!--            逆向工程-->

@@ -49,7 +49,7 @@ public class CommentController {
         comment.setGmtModified(System.currentTimeMillis());
         comment.setCommentator(user.getId());
         //因为又要查评论表又要查问题表 所以定义一个中间层可以同时进行
-        commentService.insert(comment);
+        commentService.insert(comment,user);
         //成功后返回给页面
         return ResultDTO.okOf();
     }

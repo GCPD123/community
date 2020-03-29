@@ -149,6 +149,23 @@ function collapseComment(e) {
 
 
     }
+}
+//将选中的标签加到输入框中
+function selectTag(e) {
+    let value = e.getAttribute("data-tag");
+    let previous = $("#tag").val();
+    //不等于-1表示已经存在这个值了
 
+    if (previous.indexOf(value) == -1) {
+        if (previous) {
+            $("#tag").val(previous + ',' + value);
+        } else {
+            $("#tag").val(value);
+        }
+    }
 
+}
+//展示可选的标签模块
+function showSelectTag() {
+$("#select-tag").show();
 }

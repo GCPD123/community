@@ -6,6 +6,7 @@ import life.majiang.community.mapper.UserMapper;
 import life.majiang.community.modle.User;
 import life.majiang.community.provider.GithubProvider;
 import life.majiang.community.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,8 @@ import java.util.UUID;
  * @date 2020/3/14 - 4:59 下午
  */
 @Controller
+//lombok插件的主角 可以直接将日志类注入进来 可以直接用
+@Slf4j
 public class AuthorizeController {
     @Autowired
     GithubProvider githubProvider;
@@ -74,6 +77,8 @@ public class AuthorizeController {
             System.out.println(githubUser.getName());
             return "redirect:/";
         } else {
+//            输出日志 将后面的内容输出到{}里面
+            log.error("callback get github error,{}",githubUser);
             //登陆失败
             return "redirect:/";
         }

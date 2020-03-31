@@ -198,7 +198,7 @@ public class QuestionService {
             Question updateQuestion = new Question();
             updateQuestion.setGmtModified(System.currentTimeMillis());
             updateQuestion.setTitle(question.getTitle());
-            updateQuestion.setDesc(question.getDesc());
+            updateQuestion.setDescription(question.getDescription());
             updateQuestion.setTag(question.getTag());
             //指定条件
             QuestionExample questionExample = new QuestionExample();

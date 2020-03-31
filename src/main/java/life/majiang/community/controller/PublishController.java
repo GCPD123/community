@@ -39,7 +39,7 @@ public class PublishController {
         QuestionDTO question = questionService.getById(id);
         //因为是页面要求的这样一个一个传
         model.addAttribute("title",question.getTitle());
-        model.addAttribute("desc",question.getDesc());
+        model.addAttribute("description",question.getDescription());
         model.addAttribute("tag",question.getTag());
         //给页面一个id 后面页面又将id传回后台 好判断
         model.addAttribute("id",question.getId());
@@ -61,15 +61,15 @@ public class PublishController {
     }
     @PostMapping("/publish")
     public String doPublish(@RequestParam("title") String title,
-                            @RequestParam("desc")String desc,
+                            @RequestParam("description")String desc,
                             @RequestParam("tag") String tag,
                             @RequestParam(value = "id",required = false) Long id,
                             HttpServletRequest request,
                             Model model){
 
-        //页面回显数据
+        //index页面回显数据
         model.addAttribute("title",title);
-        model.addAttribute("desc",desc);
+        model.addAttribute("description",desc);
         model.addAttribute("tag",tag);
         //将准备好的可选标签给页面 展示出来
         model.addAttribute("tags", TagCache.get());
@@ -102,7 +102,7 @@ public class PublishController {
         }
         Question question = new Question();
         question.setTitle(title);
-        question.setDesc(desc);
+        question.setDescription(desc);
         question.setTag(tag);
         question.setCreator(user.getId());
 

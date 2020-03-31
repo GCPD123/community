@@ -28,6 +28,8 @@ public class AliProvider {
     private String accessKeySecret;
     @Value("${aliyun.oss.bucketName}")
     private String bucketName;
+    @Value("${aliyun.oss.expire}")
+    private Long expire;
 
 
     public String upload( InputStream inputStream,String fileName){
@@ -47,7 +49,7 @@ public class AliProvider {
         ossClient.putObject(bucketName, generatedFileName, inputStream);
 
         // 设置URL过期时间为1小时。
-        Date expiration = new Date(new Date().getTime() + 3600 * 1000);
+        Date expiration = new Date(new Date().getTime() +  expire);
         // 生成以GET方法访问的签名URL，访客可以直接通过浏览器访问相关内容。 页面上查看时 可以显示图片
         URL url = ossClient.generatePresignedUrl(bucketName, generatedFileName, expiration);
 

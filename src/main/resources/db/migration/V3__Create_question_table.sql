@@ -3,7 +3,7 @@ create table question
 (
     id int auto_increment primary key,
     title varchar(50),
-    desc text,
+    description text,
     gmt_create bigint,
     gmt_modified bigint,
     creator int,

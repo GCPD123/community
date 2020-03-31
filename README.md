@@ -53,7 +53,7 @@ insert和insertselective区别在于前者对null也操作，后者判断如果�
 flyway:migrate如果要删除一个文件记得要删除version中的版本信息，否则以后操作就不成功了，他会校验每一个操作  
 
 maven和spring都有profiles就是开发和生产环境都可以分离 spring的是以application划分，如application-dev或者application-pro,在线上使用的时候加上参数
-java -jar -Dspring.profiles.active=环境名 target/xxx.jar 就可以使用，maven是在pom或者.m2/settings.xml文件中配置（没有这个文件的话自己创建），后者更安全，不会被别分看见
+java -jar -Dspring.profiles.active=环境名 target/xxx.jar 就可以使用，maven是在pom或者.m2/settings.xml文件中配置（没有这个文件的话自己创建），后者更安全，不会被别分看见,maven的加载配置会首先从.ms/settings.xml开始加载，所以pom中也可以读取到，配置在这里就在本地的一个文件夹上别人是看不到的
 
 ## 快捷键
 alt + 拖移 = 选中一列快速编辑  

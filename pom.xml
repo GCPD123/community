@@ -17,7 +17,7 @@
     <properties>
         <java.version>1.8</java.version>
     </properties>
-<!--maven的profiles-->
+<!--maven的profiles 这部分可以写到.m2/settings文件中去-->
     <profiles>
         <profile>
 <!--            开发环境-->

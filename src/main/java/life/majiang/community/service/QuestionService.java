@@ -40,7 +40,7 @@ public class QuestionService {
     @Autowired
     private QuestionExtMapper questionExtMapper;
 
-    public PaginationDTO list(String search, Integer page, Integer size) {
+    public PaginationDTO list(String search, String tag, Integer page, Integer size) {
         if (StringUtils.isNotBlank(search)) {
 //            按照空格分开
             String[] s = StringUtils.split(search, " ");
@@ -48,11 +48,14 @@ public class QuestionService {
              search = Arrays.stream(s).collect(Collectors.joining("|"));
         }
 
+
+
         Integer totalPage;
         //拿到偏移量 偏移量是直接输入到数据库的参数
         Integer offset = size * (page - 1);
         QuestionQueryDTO questionQueryDTO = new QuestionQueryDTO();
         questionQueryDTO.setSearch(search);
+        questionQueryDTO.setTag(tag);
         Integer totalCount = questionExtMapper.countBySearch(questionQueryDTO);
 //                对这个方法进行重构 考虑到下面也要用到类似的方法 所以抽取出来一个对象传入
 //        Integer totalCount = (int) questionMapper.countByExample(new QuestionExample());

@@ -48,7 +48,7 @@ public class HotTagTasks {
                 String[] tags = StringUtils.split(question.getTag(), ",");
 //              每一个tag 将每一个tag都缓存到chach里面 还有他的优先级
                 for (String tag : tags) {
-//                    在缓存中查找这个标签的优先级
+//                    在缓存中查找这个标签的优先级 这个里面会存满所有的标签 因为外层循环是遍历所有标签 保存到map里面
                     Integer priority = priorities.get(tag);
                     if (priority != null) {
 //                        我们自己定义的优先级计算公式
@@ -67,7 +67,7 @@ public class HotTagTasks {
 
         }
 //         所有标签循环完之后 赋值给缓存
-        hotTagCache.setTags(priorities);
+//        hotTagCache.setTags(priorities);
 //        查看热门标签的缓存
 //        hotTagCache.getTags().forEach(
 //                (k, v) -> {

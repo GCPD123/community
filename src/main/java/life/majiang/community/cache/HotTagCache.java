@@ -15,14 +15,13 @@ import java.util.*;
 @Data
 //这是一个单利模式成员变量只会初始化一次 后面再操作都是接着 操作这些属性，所以 定时任务的时候 需要有中间变量存储 然后统一赋值给成员变量 不然会有重复的值出现
 public class HotTagCache {
-    //    用来存储热门标签
-    private Map<String, Integer> tags = new HashMap<>();
+
 //排序好了的标签名称
     private List<String> hots = new ArrayList<>();
 
 //    排序
     public void updateTags(Map<String, Integer> tags) {
-        int max = 3;
+        int max = 10;
 //        java中的优先队列 用来实现top n算法 初始化队列的大小存放三个元素
         PriorityQueue<HotTagDTO> priorityQueue = new PriorityQueue<>(max);
 //        使用小顶堆实现 堆就是一个完全二叉树
@@ -32,7 +31,7 @@ public class HotTagCache {
                     HotTagDTO hotTagDTO = new HotTagDTO();
                     hotTagDTO.setName(name);
                     hotTagDTO.setPriority(priority);
-                    if (priorityQueue.size() < 3) {
+                    if (priorityQueue.size() < max) {
 //                        存入到优先队列里面
                         priorityQueue.add(hotTagDTO);
                     } else {

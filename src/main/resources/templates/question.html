@@ -4,22 +4,11 @@
     <title th:text="${question.title}">个人中心</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <!--    引入css-->
-    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="/css/community.css">
-    <link rel="stylesheet" href="/css/editormd.preview.min.css">
-    <!--    引入bootstrap的js之前 一定要引入jq js依赖jq 并且需要爱maven处重新导入下资源 否则重新编译也不生效的-->
-    <script src="/js/jquery.min.js"></script>
-    <!--    引入js-->
-    <script src="/js/bootstrap.min.js"></script>
-    <!--    处理时间的工具-->
-    <script src="/js/moment.js"></script>
-    <script src="/js/community.js"></script>
-<!--marckdown-->
-    <script src="/js/editormd.min.js"></script>
-    <script src="/js/lib/marked.min.js"></script>
-    <script src="/js/lib/prettify.min.js"></script>
+    <head th:insert="~{import :: head}"></head>
+    <head th:insert="~{import :: markdown}"></head>
+
+
+
 
 
 </head>
@@ -215,12 +204,11 @@
                     </div>
                 </div>
             </div>
-            <!--            图片-->
+
+
+<!--            边栏-->
             <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                <h4>可爱的乖妹</h4>
-                <img class="img-thumbnail question-wechat" src="/img/UNADJUSTEDNONRAW_thumb_c04.jpg">
-            </div>
+            <div th:insert="~{side :: side}"></div>
 
             <!--            相关问题-->
             <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12">

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head">
+
+    <!--    引入css-->
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/community.css">
+    <!--    引入bootstrap的js之前 一定要引入jq js依赖jq 并且需要爱maven处重新导入下资源 否则重新编译也不生效的-->
+    <script src="/js/jquery.min.js"></script>
+    <!--    引入js-->
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/community.js"></script>
+<!--谷歌广告-->
+    <script data-ad-client="ca-pub-7906698117494442" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+</head>
+
+
+<head th:fragment="markdown">
+    <link rel="stylesheet" href="/css/editormd.preview.min.css">
+    <link rel="stylesheet" href="/css/editormd.min.css">
+    <script src="/js/editormd.min.js"></script>
+    <script src="/js/lib/marked.min.js"></script>
+    <script src="/js/lib/prettify.min.js"></script>
+    <!--    处理时间的工具-->
+    <script src="/js/moment.js"></script>
+
+</head>
+
+</html>

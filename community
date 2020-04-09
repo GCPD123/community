@@ -4,7 +4,7 @@ mvn clean compile flyway:migrate -Pproduction
 mvn clean compile -DskipTests package
 pid=$(ps aux | grep "community" | grep -v grep | awk '{print $2}')
 echo "kill -9 $pid"
-kill -9 $pid
+kill  $pid
 STATUS=$?
 if [ $STATUS -eq 0 ]
 then

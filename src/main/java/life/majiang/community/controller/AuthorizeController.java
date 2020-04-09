@@ -47,12 +47,14 @@ public class AuthorizeController {
                            @RequestParam(name = "state") String state,
                            HttpServletResponse response) {
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
+        log.info("redirectUri,{}",redirectUri);
         accessTokenDTO.setRedirect_uri(redirectUri);
         accessTokenDTO.setClient_id(clientId);
         accessTokenDTO.setClient_secret(clientSecret);
         accessTokenDTO.setCode(code);
         accessTokenDTO.setState(state);
         String accessToken = githubProvider.getAccessToken(accessTokenDTO);
+        log.info("accessToken {}",accessToken);
         //这个是github到用户信息
         GIthubUser githubUser = githubProvider.getUser(accessToken);
         if (githubUser != null) {

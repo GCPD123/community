@@ -55,7 +55,7 @@ public class AuthorizeController {
         accessTokenDTO.setCode(code);
         accessTokenDTO.setState(state);
         String accessToken = githubProvider.getAccessToken(accessTokenDTO);
-        log.info("accessToken {}",accessToken);
+        log.info("++++++++++++++++++++++++++++++++++++++accessToken {}",accessToken);
         //这个是github到用户信息
         GIthubUser githubUser = githubProvider.getUser(accessToken);
         if (githubUser != null) {

@@ -46,6 +46,7 @@ public class AuthorizeController {
     public String callback(@RequestParam(name = "code") String code,
                            @RequestParam(name = "state") String state,
                            HttpServletResponse response) {
+        System.out.println(redirectUri);
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         log.info("redirectUri,{}",redirectUri);
         accessTokenDTO.setRedirect_uri(redirectUri);
